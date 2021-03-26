@@ -1,5 +1,6 @@
 package com.datastax.events.model;
 
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ public class Event {
 	private String data; 
 	private Date time; 
 	private String eventtype;
+	
 	public UUID getId() {
 		return id;
 	}
@@ -33,8 +35,8 @@ public class Event {
 	public Date getTime() {
 		return time;
 	}
-	public void setTime(Date time) {
-		this.time = time;
+	public void setTime(Date localTime) {
+		this.time = localTime;
 	}
 	public String getEventtype() {
 		return eventtype;

@@ -3,7 +3,6 @@ package com.datastax.events.webservice;
 import java.text.ParseException;
 import java.util.List;
 
-import javax.jws.WebService;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -20,7 +19,6 @@ import com.datastax.events.model.Event;
 import com.datastax.events.service.EventService;
 import com.datastax.events.utils.DateUtils;
 
-@WebService
 @Path("/")
 public class EventWS {
 

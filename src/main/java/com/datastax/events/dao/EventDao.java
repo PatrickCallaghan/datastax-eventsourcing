@@ -1,6 +1,8 @@
 package com.datastax.events.dao;
 
+import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
+import java.sql.Date;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -9,16 +11,13 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PerHostPercentileTracker;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
-import com.datastax.driver.core.policies.PercentileSpeculativeExecutionPolicy;
 import com.datastax.events.model.Event;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.CqlSessionBuilder;
+import com.datastax.oss.driver.api.core.cql.BoundStatement;
+import com.datastax.oss.driver.api.core.cql.PreparedStatement;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
 
 /**
  * @author patrickcallaghan
@@ -27,8 +26,7 @@ import com.datastax.events.model.Event;
 public class EventDao {
 
 	private static Logger logger = LoggerFactory.getLogger(EventDao.class);
-	private Cluster cluster;
-	private Session session;
+	private CqlSession session;
 
 	private static AtomicLong counter = new AtomicLong(0);
 //	private static AtomicLong totalTime = new AtomicLong(0);
@@ -47,15 +45,9 @@ public class EventDao {
 
 	public EventDao(String[] contactPoints) {
 
-		cluster = Cluster.builder().addContactPoints(contactPoints)
-				.withLoadBalancingPolicy(DCAwareRoundRobinPolicy.builder()
-						.withUsedHostsPerRemoteDc(3)
-						.allowRemoteDCsForLocalConsistencyLevel()
-						.build())
-				.build();
-	
-		
-		this.session = cluster.connect();
+	    CqlSessionBuilder builder = CqlSession.builder();
+	    builder.addContactPoint(new InetSocketAddress(contactPoints[0], 9042));		
+		session = builder.build();
 
 		this.insertEvent = session.prepare(INSERT_INTO_EVENTS);
 		this.selectByDate = session.prepare(SELECT_BY_DATE);
@@ -69,8 +61,7 @@ public class EventDao {
 		int bucket = EventDao.getBucket(dateTime);
 		String date = formatDate(dateTime);
 		
-		BoundStatement bs = new BoundStatement(this.insertEvent);
-		bs.bind(date, bucket, event.getId(), event.getAggregateType(), event.getHost(), event.getLoglevel(), event.getData(),
+		BoundStatement bs = insertEvent.bind(date, bucket, event.getId(), event.getAggregateType(), event.getHost(), event.getLoglevel(), event.getData(),
 				event.getTime(), event.getEventtype());
 		
 		
@@ -132,14 +123,13 @@ public class EventDao {
 		event.setHost(row.getString("host"));
 		event.setLoglevel(row.getString("loglevel"));		
 		event.setEventtype(row.getString("eventtype"));
-		event.setTime(row.getTimestamp("time"));
-		event.setId(row.getUUID("id"));
+		event.setTime(Date.valueOf(row.getLocalDate("time")));
+		event.setId(row.getUuid("id"));
 		return event;
 	}
 
 	public void close() {
 		session.close();
-		cluster.close();
 	}	
 
 }
