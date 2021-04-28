@@ -30,7 +30,7 @@ public abstract class RunCQLFile {
 		}
 		
 	    CqlSessionBuilder builder = CqlSession.builder();
-	    builder.addContactPoint(new InetSocketAddress(contactPointsStr.split(",")[0], 9042));		
+	    builder.withLocalDatacenter("core_dc").addContactPoint(new InetSocketAddress(contactPointsStr.split(",")[0], 9042));		
 		session = builder.build();
 	
 	}

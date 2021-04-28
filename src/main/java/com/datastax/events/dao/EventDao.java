@@ -123,7 +123,7 @@ public class EventDao {
 		event.setHost(row.getString("host"));
 		event.setLoglevel(row.getString("loglevel"));		
 		event.setEventtype(row.getString("eventtype"));
-		event.setTime(Timestamp.from(row.getInstant("time")));
+		event.setTime(row.getInstant("time"));
 		event.setId(row.getUuid("id"));
 		return event;
 	}
