@@ -1,8 +1,8 @@
 package com.datastax.events.dao;
 
 import java.net.InetSocketAddress;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -56,7 +56,9 @@ public class EventDao {
 
 	public void insertEvent(Event event) {
 		
-		DateTime dateTime = new DateTime(event.getTime());
+		Instant t = event.getTime();
+		
+		DateTime dateTime = new DateTime(t);
 
 		int bucket = EventDao.getBucket(dateTime);
 		String date = formatDate(dateTime);
