@@ -1,5 +1,6 @@
 package com.datastax.events.data;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -40,7 +41,8 @@ public class EventGenerator	{
 		DateTime newDate = DateTime.now().withMillis(millis);
 
 		Event event = EventGenerator.createEvent();
-		event.setTime(newDate.toDate());
+		Timestamp ts = new Timestamp(newDate.getMillis());
+		event.setTime(ts);
 		return event; 
 	}	
 	
@@ -64,7 +66,8 @@ public class EventGenerator	{
 		
 		Event event = EventGenerator.createEvent();		
 		DateTime newDate = DateTime.now();
-		event.setTime(newDate.toDate());		
+		Timestamp ts = new Timestamp(newDate.getMillis());
+		event.setTime(ts);		
 		return event; 
 	}
 

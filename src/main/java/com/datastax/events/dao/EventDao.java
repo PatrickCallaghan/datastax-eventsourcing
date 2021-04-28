@@ -1,8 +1,8 @@
 package com.datastax.events.dao;
 
 import java.net.InetSocketAddress;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.sql.Date;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,7 +46,7 @@ public class EventDao {
 	public EventDao(String[] contactPoints) {
 
 	    CqlSessionBuilder builder = CqlSession.builder();
-	    builder.addContactPoint(new InetSocketAddress(contactPoints[0], 9042));		
+	    builder.withLocalDatacenter("core_dc").addContactPoint(new InetSocketAddress(contactPoints[0], 9042));		
 		session = builder.build();
 
 		this.insertEvent = session.prepare(INSERT_INTO_EVENTS);
@@ -123,7 +123,7 @@ public class EventDao {
 		event.setHost(row.getString("host"));
 		event.setLoglevel(row.getString("loglevel"));		
 		event.setEventtype(row.getString("eventtype"));
-		event.setTime(Date.valueOf(row.getLocalDate("time")));
+		event.setTime(Timestamp.from(row.getInstant("time")));
 		event.setId(row.getUuid("id"));
 		return event;
 	}
