@@ -3,6 +3,7 @@ package com.datastax.events.dao;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -58,7 +59,7 @@ public class EventDao {
 		
 		Instant t = event.getTime();
 		
-		DateTime dateTime = new DateTime(t);
+		DateTime dateTime = new DateTime(Date.from(t));
 
 		int bucket = EventDao.getBucket(dateTime);
 		String date = formatDate(dateTime);
